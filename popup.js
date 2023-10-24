@@ -22,6 +22,13 @@ document.addEventListener('DOMContentLoaded', function () {
         return urlPattern.test(url);
     }
 
+    // Function to validate Redmine Issue ID
+    function isValidIssueId(issueId) {
+        // Regular expression pattern to match numeric values
+        const numericPattern = /^\d+$/;
+        return numericPattern.test(issueId);
+    }
+
     // Update and save variables to local storage as the user types
     jiraUrlInput.addEventListener('input', function () {
         const jiraUrl = jiraUrlInput.value;
@@ -60,9 +67,13 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     redmineIssueIdInput.addEventListener('input', function () {
-        const redmineIssueId = redmineIssueIdInput.value;
-        chrome.storage.local.set({'redmineIssueId': redmineIssueId}, function () {
-            status.textContent = 'Redmine Issue ID saved!';
-        });
+        const issueId = redmineIssueIdInput.value;
+        if (isValidIssueId(issueId)) {
+            chrome.storage.local.set({'redmineIssueId': issueId}, function () {
+                status.textContent = 'Redmine Issue ID saved!';
+            });
+        } else {
+            status.textContent = 'Invalid Redmine Issue ID (must be numeric)';
+        }
     });
 });
