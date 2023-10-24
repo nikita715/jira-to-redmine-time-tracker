@@ -15,12 +15,23 @@ document.addEventListener('DOMContentLoaded', function () {
         redmineIssueIdInput.value = data.redmineIssueId || '';
     });
 
+    // Function to validate URLs
+    function isValidURL(url) {
+        // Regular expression pattern to match URLs with http or https
+        const urlPattern = /^https?:\/\/([a-z0-9-]+(\.[a-z0-9-]+)*)(:\d+)?$/i;
+        return urlPattern.test(url);
+    }
+
     // Update and save variables to local storage as the user types
     jiraUrlInput.addEventListener('input', function () {
         const jiraUrl = jiraUrlInput.value;
-        chrome.storage.local.set({'jiraUrl': jiraUrl}, function () {
-            status.textContent = 'Jira URL saved!';
-        });
+        if (isValidURL(jiraUrl)) {
+            chrome.storage.local.set({'jiraUrl': jiraUrl}, function () {
+                status.textContent = 'Jira URL saved!';
+            });
+        } else {
+            status.textContent = 'Invalid Jira URL format';
+        }
     });
 
     jiraApiKeyInput.addEventListener('input', function () {
@@ -32,9 +43,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     redmineUrlInput.addEventListener('input', function () {
         const redmineUrl = redmineUrlInput.value;
-        chrome.storage.local.set({'redmineUrl': redmineUrl}, function () {
-            status.textContent = 'Redmine URL saved!';
-        });
+        if (isValidURL(redmineUrl)) {
+            chrome.storage.local.set({'redmineUrl': redmineUrl}, function () {
+                status.textContent = 'Redmine URL saved!';
+            });
+        } else {
+            status.textContent = 'Invalid Redmine URL format';
+        }
     });
 
     redmineApiKeyInput.addEventListener('input', function () {
