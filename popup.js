@@ -29,6 +29,40 @@ document.addEventListener('DOMContentLoaded', function () {
         return numericPattern.test(issueId);
     }
 
+    const toggleTrackingButton = document.getElementById('toggleTrackingButton');
+
+    // Function to toggle isTrackingEnabled and update button state
+    function toggleTrackingState() {
+        chrome.storage.local.get('isTrackingEnabled', function (data) {
+            const isTrackingEnabled = data.isTrackingEnabled;
+
+            // Toggle the boolean value
+            const updatedValue = !isTrackingEnabled;
+
+            // Update the storage with the new value
+            chrome.storage.local.set({'isTrackingEnabled': updatedValue}, function () {
+                // Update the button appearance and text
+                updateButtonState(updatedValue);
+            });
+        });
+    }
+
+    // Function to update button appearance and text based on the tracking state
+    function updateButtonState(isTrackingEnabled) {
+        toggleTrackingButton.classList.toggle('enabled', isTrackingEnabled);
+        toggleTrackingButton.classList.toggle('disabled', !isTrackingEnabled);
+        toggleTrackingButton.textContent = isTrackingEnabled ? 'Tracking enabled' : 'Tracking disabled';
+    }
+
+    // Add a click event listener to the button
+    toggleTrackingButton.addEventListener('click', toggleTrackingState);
+
+    // Initialize the button state based on the stored value
+    chrome.storage.local.get('isTrackingEnabled', function (data) {
+        const isTrackingEnabled = data.isTrackingEnabled;
+        updateButtonState(isTrackingEnabled);
+    });
+
     // Update and save variables to local storage as the user types
     jiraUrlInput.addEventListener('input', function () {
         const jiraUrl = jiraUrlInput.value;
