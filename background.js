@@ -62,15 +62,19 @@ function trackTime(jiraTimeTrackRequest, extensionParams) {
     });
 }
 
-chrome.webRequest.onBeforeRequest.addListener(
-    function (jiraRequest, tab) {
-        chrome.storage.local.get(['jiraUrl', 'jiraApiKey', 'redmineUrl', 'redmineApiKey', 'redmineIssueId', 'redmineActivityId', 'isTrackingEnabled'], function (extensionParams) {
-            let isTrackingEnabled = extensionParams.isTrackingEnabled;
-            if (isTrackingEnabled) {
-                trackTime(jiraRequest, extensionParams);
-            }
-        });
-    },
-    {urls: ["https://jira.app.local/secure/CreateWorklog.jspa"]},
-    ["requestBody"]
-);
+chrome.storage.local.get(['jiraUrl'], function (jiraUrlParams) {
+    let jiraUrl = jiraUrlParams.jiraUrl;
+
+    chrome.webRequest.onBeforeRequest.addListener(
+        function (jiraRequest, tab) {
+            chrome.storage.local.get(['jiraUrl', 'jiraApiKey', 'redmineUrl', 'redmineApiKey', 'redmineIssueId', 'redmineActivityId', 'isTrackingEnabled'], function (extensionParams) {
+                let isTrackingEnabled = extensionParams.isTrackingEnabled;
+                if (isTrackingEnabled) {
+                    trackTime(jiraRequest, extensionParams);
+                }
+            });
+        },
+        {urls: [jiraUrl + "/secure/CreateWorklog.jspa"]},
+        ["requestBody"]
+    );
+});
