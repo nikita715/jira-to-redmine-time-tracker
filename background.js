@@ -13,53 +13,61 @@ function formatRedmineDate(jiraStartDate) {
     return `${year}-${month}-${day}`;
 }
 
-function sendSuccessNotification(jiraTimeLogged, formattedDate, jiraIssueName) {
+function sendSuccessNotification(redmineResponseBody) {
+    let hours = redmineResponseBody.time_entry.hours;
+    let date = redmineResponseBody.time_entry.spent_on;
+    let issueName = redmineResponseBody.time_entry.comments;
+
     chrome.notifications.create(
         "Redmine tracker",
         {
             type: "basic",
             iconUrl: "icons/icon128.png",
             title: 'Redmine tracker',
-            message: `Tracked ${jiraTimeLogged} hours for ${formattedDate} on task ${jiraIssueName}`
+            message: `Tracked ${hours} hours for ${date} on task ${issueName}`
         }
     );
 }
 
-function trackTime(jiraTimeTrackRequest, extensionParams) {
-    let jiraUrl = extensionParams.jiraUrl;
-    let jiraApiKey = extensionParams.jiraApiKey;
-    let redmineUrl = extensionParams.redmineUrl;
-    let redmineApiKey = extensionParams.redmineApiKey;
-    let redmineIssueId = extensionParams.redmineIssueId;
-    let redmineActivityId = extensionParams.redmineActivityId;
+function createRedmineTimeEntry(redmineUrl, redmineApiKey, redmineIssueId, jiraIssueUrl, date, hours, activityId) {
+    fetch(redmineUrl + '/time_entries.json', {
+        method: 'POST',
+        body: '{"issue_id":' + redmineIssueId + ',"time_entry":{"spent_on":"' + date + '","hours":"' + hours + '","comments":"' + jiraIssueUrl + '","activity_id":' + activityId + '}}',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Redmine-API-Key': redmineApiKey,
+        },
+    }).then(response => response.json().then((json) => sendSuccessNotification(json)));
+}
 
+function trackTime(jiraTimeTrackRequest, params) {
     let jiraIssueId = jiraTimeTrackRequest.requestBody.formData.id;
-    let jiraTimeLogged = jiraTimeTrackRequest.requestBody.formData.timeLogged[0];
-    let jiraStartDate = jiraTimeTrackRequest.requestBody.formData.startDate[0];
-    let formattedDate = formatRedmineDate(jiraStartDate);
+    let jiraHours = jiraTimeTrackRequest.requestBody.formData.timeLogged[0];
+    let jiraDate = jiraTimeTrackRequest.requestBody.formData.startDate[0];
+    let redmineDate = formatRedmineDate(jiraDate);
 
+    getJiraIssueInfo(params.jiraUrl, params.jiraApiKey, jiraIssueId, jiraIssueInfoResponseBody => {
+        let jiraIssueName = jiraIssueInfoResponseBody.key;
+        let jiraIssueUrl = params.jiraUrl + '/browse/' + jiraIssueName;
+        createRedmineTimeEntry(
+            params.redmineUrl,
+            params.redmineApiKey,
+            params.redmineIssueId,
+            jiraIssueUrl,
+            redmineDate,
+            jiraHours,
+            params.redmineActivityId
+        );
+    });
+}
+
+function getJiraIssueInfo(jiraUrl, jiraApiKey, jiraIssueId, callback) {
     fetch(jiraUrl + "/rest/api/2/issue/" + jiraIssueId, {
         method: 'GET',
         headers: {
             'Authorization': 'Bearer ' + jiraApiKey,
         },
-    }).then(response => {
-        response.json().then((json) => {
-            let jiraIssueName = json.key;
-            let jiraIssueUrl = jiraUrl + '/browse/' + jiraIssueName;
-
-            fetch(redmineUrl + '/time_entries.json', {
-                method: 'POST',
-                body: '{"issue_id":' + redmineIssueId + ',"time_entry":{"spent_on":"' + formattedDate + '","hours":"' + jiraTimeLogged + '","comments":"' + jiraIssueUrl + '","activity_id":' + redmineActivityId + '}}',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Redmine-API-Key': redmineApiKey,
-                },
-            }).then(response => response.json()
-                .then(() => sendSuccessNotification(jiraTimeLogged, formattedDate, jiraIssueName))
-            );
-        });
-    });
+    }).then(response => response.json().then((json) => callback(json)));
 }
 
 chrome.storage.local.get(['jiraUrl'], function (jiraUrlParams) {
