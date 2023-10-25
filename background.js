@@ -15,12 +15,12 @@ function formatRedmineDate(jiraStartDate) {
 
 function sendSuccessNotification(jiraTimeLogged, formattedDate, jiraIssueName) {
     chrome.notifications.create(
-        "Автотрекер Redmine",
+        "Redmine tracker",
         {
             type: "basic",
             iconUrl: "icons/icon128.png",
-            title: 'Автотрекер Redmine',
-            message: `Внесено ${jiraTimeLogged} часов за ${formattedDate} по задаче ${jiraIssueName}`
+            title: 'Redmine tracker',
+            message: `Tracked ${jiraTimeLogged} hours for ${formattedDate} on task ${jiraIssueName}`
         }
     );
 }
