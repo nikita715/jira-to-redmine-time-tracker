@@ -64,7 +64,7 @@ function trackTime(jiraTimeTrackRequest, extensionParams) {
 
 chrome.webRequest.onBeforeRequest.addListener(
     function (jiraRequest, tab) {
-        chrome.storage.local.get(['jiraUrl', 'jiraApiKey', 'redmineUrl', 'redmineApiKey', 'redmineIssueId', 'isTrackingEnabled'], function (extensionParams) {
+        chrome.storage.local.get(['jiraUrl', 'jiraApiKey', 'redmineUrl', 'redmineApiKey', 'redmineIssueId', 'redmineActivityId', 'isTrackingEnabled'], function (extensionParams) {
             let isTrackingEnabled = extensionParams.isTrackingEnabled;
             if (isTrackingEnabled) {
                 trackTime(jiraRequest, extensionParams);
