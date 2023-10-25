@@ -8,12 +8,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const status = document.getElementById('status');
 
     // Load stored variables from local storage
-    chrome.storage.local.get(['jiraUrl', 'jiraApiKey', 'redmineUrl', 'redmineApiKey', 'redmineIssueId'], function (data) {
+    chrome.storage.local.get(['jiraUrl', 'jiraApiKey', 'redmineUrl', 'redmineApiKey', 'redmineIssueId', 'redmineActivityId'], function (data) {
         jiraUrlInput.value = data.jiraUrl || '';
         jiraApiKeyInput.value = data.jiraApiKey || '';
         redmineUrlInput.value = data.redmineUrl || '';
         redmineApiKeyInput.value = data.redmineApiKey || '';
         redmineIssueIdInput.value = data.redmineIssueId || '';
+        redmineActivityIdInput.value = data.redmineActivityId || '';
     });
 
     // Function to validate URLs
