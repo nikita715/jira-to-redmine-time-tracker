@@ -3,16 +3,12 @@
   "name": "Jira to Redmine time tracker",
   "version": "1.0",
   "permissions": [
-    "alarms",
-    "contextMenus",
     "storage",
     "notifications",
-    "webRequest",
-    "activeTab"
+    "webRequest"
   ],
   "host_permissions": [
-    "https://jira.app.local/*",
-    "https://pm.handh.ru/time_entries.json"
+    "<all_urls>"
   ],
   "background": {
     "service_worker": "background.js"
