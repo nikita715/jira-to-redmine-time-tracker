@@ -1,16 +1,18 @@
 {
   "manifest_version": 3,
-  "name": "My Extension",
+  "name": "Jira to Redmine time tracker",
   "version": "1.0",
   "permissions": [
     "alarms",
     "contextMenus",
     "storage",
     "notifications",
-    "webRequest"
+    "webRequest",
+    "activeTab"
   ],
   "host_permissions": [
-    "<all_urls>"
+    "https://jira.app.local/*",
+    "https://pm.handh.ru/time_entries.json"
   ],
   "background": {
     "service_worker": "background.js"
