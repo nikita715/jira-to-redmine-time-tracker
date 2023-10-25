@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const redmineUrlInput = document.getElementById('redmineUrl');
     const redmineApiKeyInput = document.getElementById('redmineApiKey');
     const redmineIssueIdInput = document.getElementById('redmineIssueId');
+    const redmineActivityIdInput = document.getElementById('redmineActivityId');
     const status = document.getElementById('status');
 
     // Load stored variables from local storage
@@ -22,8 +23,8 @@ document.addEventListener('DOMContentLoaded', function () {
         return urlPattern.test(url);
     }
 
-    // Function to validate Redmine Issue ID
-    function isValidIssueId(issueId) {
+    // Function to validate numbers
+    function isValidNumber(issueId) {
         // Regular expression pattern to match numeric values
         const numericPattern = /^\d+$/;
         return numericPattern.test(issueId);
@@ -102,12 +103,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
     redmineIssueIdInput.addEventListener('input', function () {
         const issueId = redmineIssueIdInput.value;
-        if (isValidIssueId(issueId)) {
+        if (isValidNumber(issueId)) {
             chrome.storage.local.set({'redmineIssueId': issueId}, function () {
                 status.textContent = 'Redmine Issue ID saved!';
             });
         } else {
             status.textContent = 'Invalid Redmine Issue ID (must be numeric)';
+        }
+    });
+
+    redmineActivityIdInput.addEventListener('input', function () {
+        const activityId = redmineActivityIdInput.value;
+        if (isValidNumber(activityId)) {
+            chrome.storage.local.set({'redmineActivityId': activityId}, function () {
+                status.textContent = 'Redmine Activity ID saved!';
+            });
+        } else {
+            status.textContent = 'Invalid Redmine Activity ID (must be numeric)';
         }
     });
 });

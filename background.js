@@ -31,6 +31,7 @@ function trackTime(jiraTimeTrackRequest, extensionParams) {
     let redmineUrl = extensionParams.redmineUrl;
     let redmineApiKey = extensionParams.redmineApiKey;
     let redmineIssueId = extensionParams.redmineIssueId;
+    let redmineActivityId = extensionParams.redmineActivityId;
 
     let jiraIssueId = jiraTimeTrackRequest.requestBody.formData.id;
     let jiraTimeLogged = jiraTimeTrackRequest.requestBody.formData.timeLogged[0];
@@ -49,7 +50,7 @@ function trackTime(jiraTimeTrackRequest, extensionParams) {
 
             fetch(redmineUrl + '/time_entries.json', {
                 method: 'POST',
-                body: '{"issue_id":' + redmineIssueId + ',"time_entry":{"spent_on":"' + formattedDate + '","hours":"' + jiraTimeLogged + '","comments":"' + jiraIssueUrl + '","activity_id":9}}',
+                body: '{"issue_id":' + redmineIssueId + ',"time_entry":{"spent_on":"' + formattedDate + '","hours":"' + jiraTimeLogged + '","comments":"' + jiraIssueUrl + '","activity_id":' + redmineActivityId + '}}',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-Redmine-API-Key': redmineApiKey,
