@@ -86,3 +86,17 @@ chrome.storage.local.get(['jiraUrl'], function (jiraUrlParams) {
         ["requestBody"]
     );
 });
+
+async function createOffscreen() {
+    await chrome.offscreen.createDocument({
+        url: 'offscreen/offscreen.html',
+        reasons: ['BLOBS'],
+        justification: 'keep service worker running',
+    }).catch(() => {
+    });
+}
+
+chrome.runtime.onStartup.addListener(createOffscreen);
+self.onmessage = e => {
+}; // keepAlive
+createOffscreen();
