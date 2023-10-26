@@ -29,6 +29,18 @@ function sendSuccessNotification(redmineResponseBody) {
     );
 }
 
+function sendFailureNotification(error) {
+    chrome.notifications.create(
+        "Redmine tracker",
+        {
+            type: "basic",
+            iconUrl: "icons/icon128.png",
+            title: 'Redmine tracker',
+            message: `Failed to track time due to ${error}`
+        }
+    );
+}
+
 function createRedmineTimeEntry(redmineUrl, redmineApiKey, redmineIssueId, jiraIssueUrl, date, hours, activityId) {
     fetch(redmineUrl + '/time_entries.json', {
         method: 'POST',
@@ -37,7 +49,8 @@ function createRedmineTimeEntry(redmineUrl, redmineApiKey, redmineIssueId, jiraI
             'Content-Type': 'application/json',
             'X-Redmine-API-Key': redmineApiKey,
         },
-    }).then(response => response.json().then((json) => sendSuccessNotification(json)));
+    }).then(response => response.json().then((json) => sendSuccessNotification(json)))
+        .catch(e => sendFailureNotification(e));
 }
 
 function trackTime(jiraTimeTrackRequest, params) {
@@ -67,7 +80,8 @@ function getJiraIssueInfo(jiraUrl, jiraApiKey, jiraIssueId, callback) {
         headers: {
             'Authorization': 'Bearer ' + jiraApiKey,
         },
-    }).then(response => response.json().then((json) => callback(json)));
+    }).then(response => response.json().then((json) => callback(json)))
+        .catch(e => sendFailureNotification(e));
 }
 
 chrome.storage.local.get(['jiraUrl'], function (jiraUrlParams) {
